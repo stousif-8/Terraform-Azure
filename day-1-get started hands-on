@@ -1,6 +1,115 @@
-What is Infrastructure as Code
-
+What is Infrastructure as Code?
+*******************************
 Infrastructure as Code is essentially a hub that can be used for collaboration across the IT organization to improve infrastructure deployments, 
 increase our ability to scale quickly, and improve the application development process. Infrastructure as Code allows us to do all this consistently and proficiently. 
 By using Infrastructure as Code for both our on-premises infrastructure and the public cloud, our organization can provide dynamic infrastructure to both our internal 
 team members and ensure our customers have an excellent experience.
+
+IaC Tools
+**********
+The list below represents some of the most popular Infrastructure as Code tools used by many organizations worldwide. These tools focus on deploying infrastructure on a private or public cloud platform. The list does NOT include tools such as Puppet, Chef, Saltstack, or Ansible since those are commonly placed in the configuration management category and don't really deploy infrastructure resources. There are likely other tools available, but they are not as popular as the ones listed below.
+
+HashiCorp Terraform - terraform.io
+AWS CloudFormation - aws.amazon.com/cloudformation
+Azure Resource Manager (ARM) - azure.microsoft.com
+Google Cloud Deployment Manager - cloud.google.com/deployment-manager/docs
+Pulumi - pulumi.com
+
+
+Terrafrom on AZURE Hands-On
+***************************
+before starting with hands-on make sure to have Azure CLI installed 
+
+Open Your VScode 
+Open or create a new folder with name terraform day 1 and new file with name main.tf
+
+Open the file in a integrated terminal in VScode
+
+In The Terminal follow below steps
+now check your version
+#az --version
+
+now login with azure account 
+#az login  
+--> this will pop into a browser , open & provide your Microsoft Azure account credentials
+
+After connecting it to Azure account
+-->check with connection and account details
+#az account show
+
+It displays account details with subscriptionID , Tenant ID, etc
+or else you can have a try with this below command to get more details of your account 
+#az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/{subscription-id}"
+-->make sure to replace with your subscription ID
+
+copy the details in notepad and start editing in the main file of terraform.
+
+#This is the 1st Approach to create a resource group using terraform in main.tf file 
+under main.tf file , write below steps to create resourcegroup
+# Specify the required provider
+provider "azurerm" {
+  features {}
+
+  subscription_id = "******************************"
+  client_id       = "******************************"
+  client_secret   = "******************************"  # Consider using a variable or environment variable
+  tenant_id       = "******************************"
+}
+
+# Create a resource group
+resource "azurerm_resource_group" "example" {
+  name     = "my-resource"
+  location = "South India"  # Correct capitalization
+}
+
+After writing above script , switch it to terminal and follow below commands
+#terraform init 
+
+#terraform plan
+
+#terraform apply
+
+#terraform destroy
+
+END OF 1ST Approach
+
+#This is the 2nd Approach to create a resource group using terraform in variables file
+-->This method ensures credentials are not hard-coded in the configuration, promoting better security practices.
+
+Create a new file with name terraform.tfvars and write below credentials
+terraform.tfvars: Contains your Azure credentials (like subscription_id, client_id, etc.)
+main.tf: Specifies the Azure provider with credentials pulled from variables and defines the resource group creation. 
+The var.subscription_id, var.client_id, var.client_secret, and var.tenant_id refer to the values from terraform.tfvars.
+
+
+provider "azurerm" {
+  features {}
+
+  subscription_id = var.subscription_id
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+  tenant_id       = var.tenant_id
+}
+
+variable "subscription_id" {}
+variable "client_id" {}
+variable "client_secret" {}
+variable "tenant_id" {}
+
+resource "azurerm_resource_group" "my_resource_group" {
+  name     = "myResourceGroup"
+  location = "East US"
+}
+
+After writing above script , switch it to terminal and follow below commands
+#terraform init 
+
+#terraform plan
+
+#terraform apply
+
+#terraform destroy
+
+END OF 2nd Approach
+
+These are the two ways which we can proceed to create a resource group in 2 Ways using Terraform on Azure
